@@ -100,7 +100,6 @@ Pacgongo = function() {
 
     },
     navMap: function() {
-      this.sensorUpdate();
       var i = Math.round(this.x / BLOCK);
       var j = Math.round(this.y / BLOCK);
       if ((map[j][i] === 1)) {
@@ -125,16 +124,17 @@ Pacgongo = function() {
       }
     },
     update: function() {
-      if (keystate == up) {
+      this.sensorUpdate();
+      if (keystate == up && this.wallSensor.front === 0) {
         this.vel.y = -this.speed;
         this.vel.x = 0;
-      } else if (keystate == down) {
+      } else if (keystate == down && this.wallSensor.back === 0) {
         this.vel.y = this.speed;
         this.vel.x = 0;
-      } else if (keystate == left) {
+      } else if (keystate == left && this.wallSensor.left === 0) {
         this.vel.y = 0;
         this.vel.x = -this.speed;
-      } else if (keystate == right) {
+      } else if (keystate == right && this.wallSensor.right === 0) {
         this.vel.y = 0;
         this.vel.x = this.speed;
       }
@@ -246,8 +246,6 @@ Ghost = function() {
         }
 
       }
-
-
     },
     update: function() {
       this.moveToPacgongo();

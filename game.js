@@ -12,10 +12,15 @@ var up = 38,
   left = 37,
   right = 39;
 var BLOCK = 25;
-var total_points = 222;
+var total_points = 200;
 var clear_points = 50;
 var round = 0;
 var running = true;
+var music = null;
+var hat = null;
+var ghost_points = 50;
+var ghosts_killed = 0;
+var paused = false;
 
 /*
 Left 2
@@ -27,15 +32,15 @@ Top 16
 
 var map = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+  [0, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 0],
   [0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0],
   [0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0],
   [0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0],
   [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0],
-  [0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0],
-  [0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0],
-  [0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0],
+  [0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+  [0, 1, 0, 1, 1, 1, 0, 2, 2, 2, 2, 2, 2, 2, 0, 1, 1, 0, 1, 0],
+  [0, 1, 0, 1, 1, 1, 0, 2, 2, 2, 2, 2, 2, 2, 0, 1, 1, 0, 1, 0],
+  [0, 1, 0, 1, 1, 1, 0, 2, 2, 2, 2, 2, 2, 2, 0, 1, 1, 0, 1, 0],
   [0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0],
   [0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0],
   [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
@@ -44,7 +49,7 @@ var map = [
   [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0],
   [0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0],
   [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+  [0, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ];
 
@@ -70,29 +75,40 @@ Pacgongo = function() {
       right: null,
       back: null
     },
+    superMode: false,
+    superTime: 0,
+    superStart: 0,
+    die: function() {
+      player.lives--;
+      music.pause();
+      new Audio("res/pacman-dying.mp3").play();
+      setTimeout(function() {
+        music.play();
+      }, 1000);
+    },
     sensorUpdate: function() {
       var normalX = Math.round(this.x / BLOCK);
       var normalY = Math.round(this.y / BLOCK);
 
-      if (map[normalY][Math.round(this.x / BLOCK - 0.5)] === 0) {
+      if (map[normalY][Math.round(this.x / BLOCK - 0.6)] === 0) {
         this.wallSensor.left = 1;
       } else {
         this.wallSensor.left = 0;
       }
 
-      if (map[normalY][Math.round(this.x / BLOCK + 0.25)] === 0) {
+      if (map[normalY][Math.round(this.x / BLOCK + 0.6)] === 0) {
         this.wallSensor.right = 1;
       } else {
         this.wallSensor.right = 0;
       }
 
-      if (map[Math.round(this.y / BLOCK + 0.5)][normalX] === 0) {
+      if (map[Math.round(this.y / BLOCK + 0.6)][normalX] === 0 || map[Math.round(this.y / BLOCK + 0.6)][normalX] === 8) {
         this.wallSensor.back = 1;
       } else {
         this.wallSensor.back = 0;
       }
 
-      if (map[Math.round(this.y / BLOCK - 0.5)][normalX] === 0) {
+      if (map[Math.round(this.y / BLOCK - 0.6)][normalX] === 0) {
         this.wallSensor.front = 1;
       } else {
         this.wallSensor.front = 0;
@@ -107,6 +123,17 @@ Pacgongo = function() {
         this.score++;
         map[j][i]++;
       }
+
+      if ((map[j][i] === 5)) {
+        if (this.superTime === 0) {
+          this.superStart = Date.now();
+        }
+        this.score++;
+        this.superTime += 10000;
+
+        map[j][i] = 2;
+      }
+
       if (this.wallSensor.left === 1 && this.vel.x < 0) {
         this.vel.x = 0;
       }
@@ -124,6 +151,13 @@ Pacgongo = function() {
       }
     },
     update: function() {
+      if (Date.now() < (this.superStart + this.superTime)) {
+        this.superMode = true;
+      } else {
+        this.superMode = false;
+        this.superTime = 0;
+        this.superStart = 0;
+      }
       this.sensorUpdate();
       if (keystate == up && this.wallSensor.front === 0) {
         this.vel.y = -this.speed;
@@ -147,6 +181,9 @@ Pacgongo = function() {
       this.image.height = this.height;
       this.image.width = this.width;
       ctx.drawImage(this.image, this.x, this.y);
+      if (this.superMode) {
+        document.getElementById("super").innerHTML = 'Super mode time: ' + Math.round(((this.superStart + this.superTime) - Date.now()) / 1000);
+      }
       document.getElementById("lives").innerHTML = this.lives;
       document.getElementById("score").innerHTML = 'Score: ' + this.score;
       document.getElementById("round").innerHTML = 'Round: ' + round;
@@ -157,6 +194,7 @@ Pacgongo = function() {
 Ghost = function() {
   return {
     image: document.getElementById("ghostcoffey"),
+    scareImage: document.getElementById("ghostcoffey-scare"),
     x: 0,
     y: 0,
     vel: {
@@ -185,7 +223,7 @@ Ghost = function() {
         this.wallSensor.right = 0;
       }
 
-      if (map[Math.round(this.y / BLOCK + 0.5)][normalX] === 0) {
+      if (map[Math.round(this.y / BLOCK + 0.5)][normalX] === 0 || map[Math.round(this.y / BLOCK + 0.5)][normalX] === 8) {
         this.wallSensor.back = 1;
       } else {
         this.wallSensor.back = 0;
@@ -195,6 +233,10 @@ Ghost = function() {
         this.wallSensor.front = 1;
       } else {
         this.wallSensor.front = 0;
+      }
+
+      if (normalX === 10 && normalY === 5) {
+        this.wallSensor.back = 1;
       }
 
     },
@@ -244,7 +286,10 @@ Ghost = function() {
         } else {
           this.vel.y = 0;
         }
-
+        if (player.superMode) {
+          this.vel.x *= -1;
+          this.vel.y *= -1;
+        }
       }
     },
     update: function() {
@@ -253,15 +298,27 @@ Ghost = function() {
       this.x += this.vel.x;
       this.y += this.vel.y;
       if (intersect(this.x, this.y, this.width, this.height,
-          player.x, player.y, player.width, player.height)) {
-        player.lives--;
+          player.x, player.y, player.width, player.height) && !player.superMode) {
+        player.die();
         resetField();
+      } else if (intersect(this.x, this.y, this.width, this.height,
+          player.x, player.y, player.width, player.height)) {
+        player.score += ghost_points;
+        ghosts_killed++;
+        this.x = (Math.random() * (6 * BLOCK - this.width)) + 8 * BLOCK;
+        this.y = Math.random() * (2 * BLOCK - this.height) + 7 * BLOCK;
       }
     },
     draw: function() {
       this.image.height = this.height;
       this.image.width = this.width;
-      ctx.drawImage(this.image, this.x, this.y);
+      this.scareImage.height = this.height;
+      this.scareImage.width = this.width;
+      if (!player.superMode) {
+        ctx.drawImage(this.image, this.x, this.y);
+      } else {
+        ctx.drawImage(this.scareImage, this.x, this.y);
+      }
     }
   };
 };
@@ -282,6 +339,10 @@ function resetField() {
       tempGhost.y = Math.random() * (2 * BLOCK - tempGhost.height) + 7 * BLOCK;
       ghosts.push(tempGhost);
     }
+    paused = true;
+    setTimeout(function() {
+      paused = false;
+    }, 1000);
   }
 }
 
@@ -293,6 +354,15 @@ function drawMap() {
         ctx.fillRect(j * BLOCK + BLOCK / 2, i * BLOCK + BLOCK / 2, 4, 4);
       } else if (map[i][j] === 0) {
         ctx.fillRect(j * BLOCK, i * BLOCK, BLOCK, BLOCK);
+      } else if (map[i][j] === 5) {
+        ctx.drawImage(hat, j * BLOCK, i * BLOCK + 6);
+      } else if (map[i][j] === 8) {
+        ctx.strokeStyle = 'darkgreen';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(j * BLOCK, i * BLOCK + 5);
+        ctx.lineTo(j * BLOCK + BLOCK, i * BLOCK + 5);
+        ctx.stroke();
       }
     }
   }
@@ -306,16 +376,20 @@ function intersect(ax, ay, aw, ah, bx, by, bw, bh) {
 function main() {
   canvas = document.getElementById("game");
   ctx = canvas.getContext("2d");
-  backup_map = map.slice();
   document.addEventListener("keydown", function(evt) {
     keystate = evt.keyCode;
+    if (keystate === 80) {
+      paused = !paused;
+    }
   });
 
   init();
 
   var loop = function() {
-    update();
-    draw();
+    if (!paused) {
+      update();
+      draw();
+    }
     window.requestAnimationFrame(loop, canvas);
   };
   window.requestAnimationFrame(loop, canvas);
@@ -324,10 +398,10 @@ function main() {
 function init() {
   player = new Pacgongo();
   resetField();
-  var music = new Audio("res/pacman.mp3");
+  music = new Audio("res/pacman.mp3");
   music.loop = true;
   music.play();
-
+  hat = document.getElementById("hat");
 }
 
 function clone(src) {
@@ -346,7 +420,7 @@ function getAstarMap() {
   var grid = new PF.Grid(map[0].length, map.length);
   for (var i = 0; i < map.length; i++) {
     for (var j = 0; j < map[i].length; j++) {
-      if (map[i][j] === 2 || map[i][j] === 1) {
+      if (map[i][j] === 2 || map[i][j] === 1 || map[i][j] === 5 || map[i][j] === 8) {
         grid.setWalkableAt(j, i, true);
       } else {
         grid.setWalkableAt(j, i, false);
@@ -357,23 +431,22 @@ function getAstarMap() {
 }
 
 function update() {
-  // document.getElementById('soundtrack').play();
   if (!running) {
     player.y += player.speed * 3;
     player.draw();
   } else {
     if (player.lives <= 0) {
       running = false;
-      // alert('Game Over ---- You scored ' + player.score + ' points!');
-      new Audio("res/pacman-dying.mp3").play();
-
+      alert('Game Over ---- You scored ' + player.score + ' points!');
       setTimeout(function() {
         location.reload();
       }, 2000);
 
     }
-    if (((player.score - clear_points * round) % total_points) === 0) {
+    if (((player.score - clear_points * round - ghost_points * ghosts_killed) % total_points) === 0) {
       round++;
+      numGhosts++;
+      player.score += clear_points + 1;
       map = clone(backup_map);
       resetField();
     }

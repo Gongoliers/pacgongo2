@@ -122,7 +122,6 @@
       -webkit-align-items: center;
       border-radius: 100%;
     }
-
   </style>
 </head>
 
@@ -150,25 +149,31 @@
             <div class="share">
 
               <!-- Place this tag where you want the share button to render. -->
-  <div class="g-plus" data-action="share" data-annotation="bubble" data-height="24" data-href="http://gongoliers.github.io/pacgongo2"></div>
+              <div class="g-plus" data-action="share" data-annotation="bubble" data-height="24" data-href="http://gongoliers.github.io/pacgongo2"></div>
 
-  <!-- Place this tag after the last share tag. -->
-  <script type="text/javascript">
-    (function() {
-      var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-      po.src = 'https://apis.google.com/js/platform.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-    })();
-  </script>
+              <!-- Place this tag after the last share tag. -->
+              <script type="text/javascript">
+                (function() {
+                  var po = document.createElement('script');
+                  po.type = 'text/javascript';
+                  po.async = true;
+                  po.src = 'https://apis.google.com/js/platform.js';
+                  var s = document.getElementsByTagName('script')[0];
+                  s.parentNode.insertBefore(po, s);
+                })();
+              </script>
             </div>
 
           </div>
         </div>
       </div>
-      <canvas class="mdl-shadow--2dp" id="game" height="500px" width="500px">Canvas not supported</canvas>
+      <canvas class="mdl-shadow--4dp" id="game" height="500px" width="500px">Canvas not supported</canvas>
       <div id="timer" class="mdl-shadow--2dp">
         <h5>Powerup</h5>
         <h2 id="super">0s</h2>
+        <h3>Round:
+          <span id="round">0</span>
+        </h3>
       </div>
     </div>
   </main>

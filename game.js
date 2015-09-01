@@ -81,11 +81,11 @@ Pacgongo = function() {
     die: function() {
       this.lives--;
       music.pause();
-      if(this.lives === 2){
+      if (this.lives === 2) {
         document.getElementById("three").setAttribute("style", "display:none;");
-      } else if(this.lives === 1){
+      } else if (this.lives === 1) {
         document.getElementById("two").setAttribute("style", "display:none;");
-      } else if(this.lives === 0){
+      } else if (this.lives === 0) {
         document.getElementById("one").setAttribute("style", "display:none;");
       }
       new Audio("res/pacman-dying.mp3").play();
@@ -193,7 +193,7 @@ Pacgongo = function() {
         document.getElementById("super").innerHTML = Math.round(((this.superStart + this.superTime) - Date.now()) / 1000) + 's';
       }
       document.getElementById("score").innerHTML = this.score;
-      // document.getElementById("round").innerHTML = 'Round: ' + round;
+      document.getElementById("round").innerHTML = round;
     }
   };
 };
@@ -382,7 +382,7 @@ function intersect(ax, ay, aw, ah, bx, by, bw, bh) {
 
 function main() {
   console.log(document.body);
-  if(screen.width <= 890){
+  if (screen.width <= 890) {
     alert("Your screen is too small");
   }
   canvas = document.getElementById("game");

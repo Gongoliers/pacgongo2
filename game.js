@@ -79,8 +79,15 @@ Pacgongo = function() {
     superTime: 0,
     superStart: 0,
     die: function() {
-      player.lives--;
+      this.lives--;
       music.pause();
+      if(this.lives === 2){
+        document.getElementById("three").setAttribute("style", "display:none;");
+      } else if(this.lives === 1){
+        document.getElementById("two").setAttribute("style", "display:none;");
+      } else if(this.lives === 0){
+        document.getElementById("one").setAttribute("style", "display:none;");
+      }
       new Audio("res/pacman-dying.mp3").play();
       setTimeout(function() {
         music.play();
@@ -118,6 +125,7 @@ Pacgongo = function() {
     navMap: function() {
       var i = Math.round(this.x / BLOCK);
       var j = Math.round(this.y / BLOCK);
+
       if ((map[j][i] === 1)) {
         new Audio("res/pacman-waka-waka.mp3").play();
         this.score++;
@@ -182,11 +190,10 @@ Pacgongo = function() {
       this.image.width = this.width;
       ctx.drawImage(this.image, this.x, this.y);
       if (this.superMode) {
-        document.getElementById("super").innerHTML = 'Super mode time: ' + Math.round(((this.superStart + this.superTime) - Date.now()) / 1000);
+        document.getElementById("super").innerHTML = Math.round(((this.superStart + this.superTime) - Date.now()) / 1000) + 's';
       }
-      document.getElementById("lives").innerHTML = this.lives;
-      document.getElementById("score").innerHTML = 'Score: ' + this.score;
-      document.getElementById("round").innerHTML = 'Round: ' + round;
+      document.getElementById("score").innerHTML = this.score;
+      // document.getElementById("round").innerHTML = 'Round: ' + round;
     }
   };
 };
@@ -374,6 +381,10 @@ function intersect(ax, ay, aw, ah, bx, by, bw, bh) {
 }
 
 function main() {
+  console.log(document.body);
+  if(screen.width <= 890){
+    alert("Your screen is too small");
+  }
   canvas = document.getElementById("game");
   ctx = canvas.getContext("2d");
   document.addEventListener("keydown", function(evt) {

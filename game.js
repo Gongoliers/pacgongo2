@@ -39,6 +39,8 @@ function playMainTheme(buffer){
 }
 
 function playSound(buffer){
+  if(buffer === null)
+    return;
   var source = context.createBufferSource();
   source.buffer = buffer;
   source.connect(context.destination);

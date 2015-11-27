@@ -17,18 +17,43 @@ var clear_points = 50;
 var round = 0;
 var running = true;
 var music = null;
+var wakaWaka = null;
+var dyingSound = null;
 var hat = null;
 var ghost_points = 50;
 var ghosts_killed = 0;
 var paused = false;
 
-/*
-Left 2
-Bottom 4
-Right 8
-Top 16
 
-*/
+var AudioContext = window.AudioContext || window.webkitAudioContext;
+var context = new AudioContext();
+function playMainTheme(buffer){
+  var src = context.createBufferSource();
+  src.buffer = buffer;
+  music = context.createGain();
+  music.gain.value = 1;
+  src.loop = true;
+  src.connect(music);
+  music.connect(context.destination);
+  src.start(0);
+}
+
+function playSound(buffer){
+  var source = context.createBufferSource();
+  source.buffer = buffer;
+  source.connect(context.destination);
+  source.start(0);
+}
+
+function loadSounds(){
+  var bufferLoader = new BufferLoader(
+    context, ['res/pacman.mp3', 'res/pacman-waka-waka.mp3', 'res/pacman-dying.mp3'], function(bufferList){
+      playMainTheme(bufferList[0]);
+      wakaWaka = bufferList[1];
+      dyingSound = bufferList[2];
+    });
+    bufferLoader.load();
+}
 
 var map = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -80,7 +105,7 @@ Pacgongo = function() {
     superStart: 0,
     die: function() {
       this.lives--;
-      music.pause();
+      music.gain.value = 0;
       if (this.lives === 2) {
         document.getElementById("three").setAttribute("style", "display:none;");
       } else if (this.lives === 1) {
@@ -88,9 +113,9 @@ Pacgongo = function() {
       } else if (this.lives === 0) {
         document.getElementById("one").setAttribute("style", "display:none;");
       }
-      new Audio("res/pacman-dying.mp3").play();
+      playSound(dyingSound);
       setTimeout(function() {
-        music.play();
+        music.gain.value = 1;
       }, 1000);
     },
     sensorUpdate: function() {
@@ -127,7 +152,7 @@ Pacgongo = function() {
       var j = Math.round(this.y / BLOCK);
 
       if ((map[j][i] === 1)) {
-        new Audio("res/pacman-waka-waka.mp3").play();
+        playSound(wakaWaka);
         this.score++;
         map[j][i]++;
       }
@@ -183,6 +208,7 @@ Pacgongo = function() {
       this.navMap();
       this.x += this.vel.x;
       this.y += this.vel.y;
+      
 
     },
     draw: function() {
@@ -409,9 +435,7 @@ function main() {
 function init() {
   player = new Pacgongo();
   resetField();
-  music = new Audio("res/pacman.mp3");
-  music.loop = true;
-  music.play();
+  loadSounds();
   hat = document.getElementById("hat");
 }
 

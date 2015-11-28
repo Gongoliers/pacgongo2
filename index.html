@@ -4,9 +4,7 @@
 <head>
   <meta charset="utf-8">
   <title>PacGongo 2</title>
-  <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.green-orange.min.css">
-  <script src="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="FRC Team 5112, The Gongoliers, presents: PacGongo 2">
   <style media="screen">
     body,
@@ -16,180 +14,43 @@
       height: 100vh;
       margin: 0;
       padding: 0;
+      background-color: lightgreen;
     }
-
-    .page-content,
-    main {
-      max-height: 100%;
-    }
-
-    @media (max-width: 1449px) {
-      #info {
-        position: absolute;
-        margin: auto;
-        bottom: 16px;
-        left: 150px;
-        height: 300px;
-        width: 300px;
-        background-color: #2E7D32;
-        color: white;
-      }
-      #timer {
-        position: absolute;
-        margin: auto;
-        bottom: 16px;
-        right: 150px;
-        height: 300px;
-        width: 300px;
-        background-color: #2E7D32;
-        color: white;
-        display: -webkit-flex;
-        -webkit-flex-direction: column;
-        -webkit-justify-content: center;
-        -webkit-align-items: center;
-      }
-      #game {
-        position: absolute;
-        margin: auto;
-        left: 0;
-        right: 0;
-        top: 16px;
-      }
-    }
-
-    @media (min-width: 1450px) {
-      #info {
-        position: absolute;
-        margin: auto;
-        top: 0;
-        bottom: 0;
-        left: 150px;
-        height: 300px;
-        width: 300px;
-        background-color: #2E7D32;
-        color: white;
-      }
-      #timer {
-        position: absolute;
-        margin: auto;
-        top: 0;
-        bottom: 0;
-        right: 150px;
-        height: 300px;
-        width: 300px;
-        background-color: #2E7D32;
-        color: white;
-        display: -webkit-flex;
-        -webkit-flex-direction: column;
-        -webkit-justify-content: center;
-        -webkit-align-items: center;
-      }
-      #game {
-        position: absolute;
-        margin: auto;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-      }
-    }
-
-    .lives,
-    .score {
-      margin: 16px;
-    }
-
-    #points,
-    #score {
-      display: inline-block;
-    }
-
-    .center {
-      text-align: center;
-    }
-
-    .life {
-      height: 50px;
-      width: auto;
-    }
-
-    .circle {
-      background-color: white;
-      height: 70px;
-      display: -webkit-flex;
-      -webkit-flex-direction: column;
-      -webkit-justify-content: center;
-      -webkit-align-items: center;
-      border-radius: 100%;
-    }
-
-    .title {
+    .main {
       position: absolute;
+      margin: auto;
       left: 0;
       right: 0;
-      top: 16px;
-      margin: auto;
+      top: 0;
+    }
+    .main h6, .main h5, .main img {
+      padding-left: 24px;
+      color: white;
+      margin: 16px;
+    }
+    .main img {
+      height: 32px;
+    }
+
+    .main h6 {
+      font-size: 24px;
+    }
+
+    .main h5 {
+      font-size: 32px;
     }
   </style>
 </head>
 
 <body>
-  <main>
-    <div class="page-content">
-      <div class="title">
-        <h1 class="center">PacGongo 2</h1>
-        <h4 class="center">FRC Team 5112, The Gongoliers</h4>
+      <div class="main" style="width: 500px; height: 800px; background-color:green;">
+        <canvas id="game" height="500px" width="500px">Canvas not supported</canvas>
+        <h5><span id="score">0</span> Points</h5>
+        <h6>Powerup: <span id="super">0s</span></h6>
+        <h6>Round: <span id="round">1</span></h6>
+        <img src="res/pacgongo.png" alt="life" id="one"/>
+        <img src="res/pacgongo.png" alt="life" id="two"/>
       </div>
-
-      <div id="info" class="mdl-shadow--2dp">
-        <div class="lives">
-          <div class="lives--images mdl-grid">
-            <div class="mdl-cell mdl-cell--4-col center circle">
-              <img id="one" src="res/pacgongo.png" alt="pacgongo" class="life" />
-            </div>
-            <div class="mdl-cell mdl-cell--4-col center circle">
-              <img id="two" src="res/pacgongo.png" alt="pacgongo" class="life" />
-            </div>
-            <div class="mdl-cell mdl-cell--4-col center circle">
-              <img id="three" src="res/pacgongo.png" alt="pacgongo" class="life" />
-            </div>
-          </div>
-        </div>
-        <div class="score">
-          <div class="center">
-            <h2 id="score">0</h2>
-            <small id="points">points</small>
-            <div class="share">
-
-              <!-- Place this tag where you want the share button to render. -->
-              <div class="g-plus" data-action="share" data-annotation="bubble" data-height="24" data-href="http://gongoliers.github.io/pacgongo2"></div>
-
-              <!-- Place this tag after the last share tag. -->
-              <script type="text/javascript">
-                (function() {
-                  var po = document.createElement('script');
-                  po.type = 'text/javascript';
-                  po.async = true;
-                  po.src = 'https://apis.google.com/js/platform.js';
-                  var s = document.getElementsByTagName('script')[0];
-                  s.parentNode.insertBefore(po, s);
-                })();
-              </script>
-            </div>
-
-          </div>
-        </div>
-      </div>
-      <canvas class="mdl-shadow--4dp" id="game" height="500px" width="500px">Canvas not supported</canvas>
-      <div id="timer" class="mdl-shadow--2dp">
-        <h5>Powerup</h5>
-        <h2 id="super">0s</h2>
-        <h3>Round:
-          <span id="round">0</span>
-        </h3>
-      </div>
-    </div>
-  </main>
 
   <img id="pacgongo" src="res/pacgongo.png" style="display:none;" />
   <img id="ghostcoffey" src="res/ghostcoffey.png" style="display:none;" />

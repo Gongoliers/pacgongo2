@@ -24,10 +24,22 @@ var ghost_points = 50;
 var ghosts_killed = 0;
 var paused = false;
 
+window.addEventListener("deviceorientation", function(event) {
+  if (event.gamma > 30) {
+    keystate = right;
+  } else if (event.gamma < -30) {
+    keystate = left;
+  } else if (event.beta < 0) {
+    keystate = up;
+  } else if (event.beta > 30) {
+    keystate = down;
+  }
+});
 
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 var context = new AudioContext();
-function playMainTheme(buffer){
+
+function playMainTheme(buffer) {
   var src = context.createBufferSource();
   src.buffer = buffer;
   music = context.createGain();
@@ -38,8 +50,8 @@ function playMainTheme(buffer){
   src.start(0);
 }
 
-function playSound(buffer){
-  if(buffer === null)
+function playSound(buffer) {
+  if (buffer === null)
     return;
   var source = context.createBufferSource();
   source.buffer = buffer;
@@ -47,14 +59,15 @@ function playSound(buffer){
   source.start(0);
 }
 
-function loadSounds(){
+function loadSounds() {
   var bufferLoader = new BufferLoader(
-    context, ['res/pacman.mp3', 'res/pacman-waka-waka.mp3', 'res/pacman-dying.mp3'], function(bufferList){
+    context, ['res/pacman.mp3', 'res/pacman-waka-waka.mp3', 'res/pacman-dying.mp3'],
+    function(bufferList) {
       playMainTheme(bufferList[0]);
       wakaWaka = bufferList[1];
       dyingSound = bufferList[2];
     });
-    bufferLoader.load();
+  bufferLoader.load();
 }
 
 var map = [
@@ -109,10 +122,8 @@ Pacgongo = function() {
       this.lives--;
       music.gain.value = 0;
       if (this.lives === 2) {
-        document.getElementById("three").setAttribute("style", "display:none;");
-      } else if (this.lives === 1) {
         document.getElementById("two").setAttribute("style", "display:none;");
-      } else if (this.lives === 0) {
+      } else if (this.lives === 1) {
         document.getElementById("one").setAttribute("style", "display:none;");
       }
       playSound(dyingSound);
@@ -210,7 +221,7 @@ Pacgongo = function() {
       this.navMap();
       this.x += this.vel.x;
       this.y += this.vel.y;
-      
+
 
     },
     draw: function() {
@@ -221,7 +232,7 @@ Pacgongo = function() {
         document.getElementById("super").innerHTML = Math.round(((this.superStart + this.superTime) - Date.now()) / 1000) + 's';
       }
       document.getElementById("score").innerHTML = this.score;
-      document.getElementById("round").innerHTML = round;
+      document.getElementById("round").innerHTML = round + 1;
     }
   };
 };
@@ -382,7 +393,7 @@ function resetField() {
 }
 
 function drawMap() {
-  ctx.fillStyle = 'darkgreen';
+  ctx.fillStyle = 'green';
   for (var i = 0; i < map.length; i++) {
     for (var j = 0; j < map[i].length; j++) {
       if (map[i][j] === 1) {
@@ -392,7 +403,7 @@ function drawMap() {
       } else if (map[i][j] === 5) {
         ctx.drawImage(hat, j * BLOCK, i * BLOCK + 6);
       } else if (map[i][j] === 8) {
-        ctx.strokeStyle = 'darkgreen';
+        ctx.strokeStyle = 'green';
         ctx.lineWidth = 5;
         ctx.beginPath();
         ctx.moveTo(j * BLOCK, i * BLOCK + 5);
@@ -409,10 +420,7 @@ function intersect(ax, ay, aw, ah, bx, by, bw, bh) {
 }
 
 function main() {
-  console.log(document.body);
-  if (screen.width <= 890) {
-    alert("Your screen is too small");
-  }
+  loadSounds();
   canvas = document.getElementById("game");
   ctx = canvas.getContext("2d");
   document.addEventListener("keydown", function(evt) {
@@ -437,7 +445,6 @@ function main() {
 function init() {
   player = new Pacgongo();
   resetField();
-  loadSounds();
   hat = document.getElementById("hat");
 }
 

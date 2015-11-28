@@ -16,9 +16,9 @@ var total_points = 200;
 var clear_points = 50;
 var round = 0;
 var running = true;
-var music = null;
 var wakaWaka = null;
 var dyingSound = null;
+var eatHatSound = null;
 var hat = null;
 var ghost_points = 50;
 var ghosts_killed = 0;
@@ -42,12 +42,16 @@ var context = new AudioContext();
 function playMainTheme(buffer) {
   var src = context.createBufferSource();
   src.buffer = buffer;
-  music = context.createGain();
-  music.gain.value = 1;
-  src.loop = true;
-  src.connect(music);
-  music.connect(context.destination);
+  src.loop = false;
+  src.connect(context.destination);
   src.start(0);
+  paused = true;
+  ctx.font = "40px Georgia";
+  ctx.fillText("Ready!", WIDTH/2-40, HEIGHT/2-10);
+  setTimeout(function(){
+    src.stop(0);
+    paused = false;
+  }, 4100);
 }
 
 function playSound(buffer) {
@@ -59,13 +63,27 @@ function playSound(buffer) {
   source.start(0);
 }
 
+function playExtrapac(buffer){
+  if(buffer === null)
+    return;
+  var source = context.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
+  extrapacMusic = context.createGain();
+  extrapacMusic.gain.value = 1;
+  source.connect(extrapacMusic);
+  extrapacMusic.connect(context.destination);
+  source.start(0);
+}
+
 function loadSounds() {
   var bufferLoader = new BufferLoader(
-    context, ['res/pacman.mp3', 'res/pacman-waka-waka.mp3', 'res/pacman-dying.mp3'],
+    context, ['res/pacman_beginning.wav', 'res/pacman-waka-waka.mp3', 'res/pacman-dying.mp3', 'res/pacman_eatfruit.wav'],
     function(bufferList) {
       playMainTheme(bufferList[0]);
       wakaWaka = bufferList[1];
       dyingSound = bufferList[2];
+      eatHatSound = bufferList[3];
     });
   bufferLoader.load();
 }
@@ -120,16 +138,12 @@ Pacgongo = function() {
     superStart: 0,
     die: function() {
       this.lives--;
-      music.gain.value = 0;
       if (this.lives === 2) {
         document.getElementById("two").setAttribute("style", "display:none;");
       } else if (this.lives === 1) {
         document.getElementById("one").setAttribute("style", "display:none;");
       }
       playSound(dyingSound);
-      setTimeout(function() {
-        music.gain.value = 1;
-      }, 1000);
     },
     sensorUpdate: function() {
       var normalX = Math.round(this.x / BLOCK);
@@ -171,12 +185,10 @@ Pacgongo = function() {
       }
 
       if ((map[j][i] === 5)) {
-        if (this.superTime === 0) {
-          this.superStart = Date.now();
-        }
+        playSound(eatHatSound);
+        this.superStart = Date.now();
         this.score++;
-        this.superTime += 10000;
-
+        this.superTime = 10000;
         map[j][i] = 2;
       }
 
@@ -369,7 +381,7 @@ Ghost = function() {
   };
 };
 
-function resetField() {
+function resetField(p) {
   if (running) {
     player.x = (WIDTH) / 2;
     player.y = HEIGHT - player.height - BLOCK;
@@ -385,10 +397,12 @@ function resetField() {
       tempGhost.y = Math.random() * (2 * BLOCK - tempGhost.height) + 7 * BLOCK;
       ghosts.push(tempGhost);
     }
-    paused = true;
-    setTimeout(function() {
-      paused = false;
-    }, 1000);
+    if(p !== false){
+      paused = true;
+      setTimeout(function() {
+        paused = false;
+      }, 1000);
+    }
   }
 }
 
@@ -444,7 +458,7 @@ function main() {
 
 function init() {
   player = new Pacgongo();
-  resetField();
+  resetField(false);
   hat = document.getElementById("hat");
 }
 

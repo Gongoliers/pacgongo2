@@ -10,11 +10,44 @@ var canvas, ctx;
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 var audio = new AudioContext();
 var mainTheme, wakaWaka, dyingSound, eatHatSound;
+var soundOn = null;
+var source;
+var volumeButton = document.getElementById("volume");
+
+if (typeof(Storage) !== "undefined") {
+  var vol = localStorage.getItem("volume") === "true";
+  if (vol === null) {
+    soundOn = true;
+    localStorage.setItem("volume", true);
+  } else {
+    soundOn = vol;
+    if (soundOn) {
+      volumeButton.src = "res/volume_on.png";
+    } else {
+      volumeButton.src = "res/volume_off.png";
+    }
+  }
+}
+
+volumeButton.addEventListener("click", function(event) {
+  if (soundOn) {
+    volumeButton.src = "res/volume_off.png";
+    soundOn = false;
+    if (source !== null)
+      source.stop(0);
+  } else {
+    volumeButton.src = "res/volume_on.png";
+    soundOn = true;
+  }
+  if (typeof(Storage) !== "undefined") {
+    localStorage.setItem("volume", soundOn);
+  }
+});
 
 function playSound(buffer) {
-  if (buffer === null)
+  if (buffer === null || !soundOn)
     return;
-  var source = audio.createBufferSource();
+  source = audio.createBufferSource();
   source.buffer = buffer;
   source.connect(audio.destination);
   source.start(0);
@@ -31,6 +64,8 @@ function loadSounds() {
     });
   bufferLoader.load();
 }
+
+
 
 // Keypress
 var keystate = null;
@@ -67,20 +102,43 @@ function main() {
   loadSounds();
   canvas = document.getElementById("game");
   ctx = canvas.getContext("2d");
-  setTimeout(function(){
-    document.getElementById("shade").classList.add("gone");
-    document.getElementById("splash").classList.add("slideAway");
-    init();
-    setTimeout(function() {
-      window.requestAnimationFrame(loop, canvas);
-    }, 500);
+  init();
+  draw();
+  ctx.font = "12px Arial";
+  ctx.fillText("Ready!", WIDTH / 2 - 12, 18 * BLOCK - 5);
+  setTimeout(function() {
+    window.requestAnimationFrame(loop, canvas);
   }, 4100);
 }
 
 function loop() {
   update();
   draw();
-  window.requestAnimationFrame(loop, canvas);
+  if (player.lives >= 0 && !player.dying)
+    window.requestAnimationFrame(loop, canvas);
+  else if ((player.dying && player.lives >= 0) || map.count === 0) {
+    for (var g = 0; g < 4; g++) {
+      ghosts[g].x = 12 * BLOCK + g * BLOCK;
+      ghosts[g].y = 14 * BLOCK;
+    }
+    player.x = 14 * BLOCK;
+    player.y = 23 * BLOCK;
+    player.dying = false;
+    if (map.count === 0)
+      map = new Map(BLOCK);
+    setTimeout(function() {
+      ctx.fillText("Ready!", WIDTH / 2 - 12, 18 * BLOCK - 5);
+      setTimeout(function() {
+        window.requestAnimationFrame(loop, canvas);
+      }, 1000);
+    }, 500);
+  } else {
+    ctx.fillStyle = "#f00";
+    ctx.fillText("Game Over!", WIDTH / 2 - 28, 18 * BLOCK - 5);
+    setTimeout(function() {
+      window.location.reload();
+    }, 1000);
+  }
 }
 
 function init() {
@@ -92,17 +150,6 @@ function init() {
 }
 
 function update() {
-  if (player.dying || map.count === 0) {
-    for (var g = 0; g < 4; g++) {
-      ghosts[g].x = 12 * BLOCK + g * BLOCK;
-      ghosts[g].y = 14 * BLOCK;
-    }
-    player.x = 14 * BLOCK;
-    player.y = 23 * BLOCK;
-    player.dying = false;
-  }
-  if (map.count === 0)
-    map = new Map(BLOCK);
   player.update(keystate, map);
   for (var i = 0; i < ghosts.length; i++) {
     ghosts[i].update(player, map);

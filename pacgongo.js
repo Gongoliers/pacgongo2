@@ -31,9 +31,6 @@ var Pacgongo = function(size) {
         document.getElementById("two").setAttribute("style", "display:none;");
       } else if (this.lives === 0) {
         document.getElementById("one").setAttribute("style", "display:none;");
-      } else if (this.lives < 0) {
-        alert("Game over!");
-        window.location.reload();
       }
     },
     image: document.getElementById("pacgongo"),

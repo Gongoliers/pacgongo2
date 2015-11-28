@@ -24,7 +24,7 @@ function loadSounds() {
   var bufferLoader = new BufferLoader(
     audio, ['res/pacman_beginning.wav', 'res/pacman-waka-waka.mp3', 'res/pacman-dying.mp3', 'res/pacman_eatfruit.wav'],
     function(bufferList) {
-      mainTheme = bufferList[0];
+      playSound(bufferList[0]);
       wakaWaka = bufferList[1];
       dyingSound = bufferList[2];
       eatHatSound = bufferList[3];
@@ -67,10 +67,14 @@ function main() {
   loadSounds();
   canvas = document.getElementById("game");
   ctx = canvas.getContext("2d");
-  init();
-  setTimeout(function() {
-    window.requestAnimationFrame(loop, canvas);
-  }, 500);
+  setTimeout(function(){
+    document.getElementById("shade").classList.add("gone");
+    document.getElementById("splash").classList.add("slideAway");
+    init();
+    setTimeout(function() {
+      window.requestAnimationFrame(loop, canvas);
+    }, 500);
+  }, 4100);
 }
 
 function loop() {

@@ -8,7 +8,6 @@
   <meta name="description" content="FRC Team 5112, The Gongoliers, presents: PacGongo 2">
   <link rel="manifest" href="manifest.json">
   <style media="screen">
-
     body,
     html {
       height: 100%;
@@ -36,7 +35,7 @@
     }
 
     .main img {
-      height: 32px;
+      height: 24px;
     }
 
     .main h6 {
@@ -46,10 +45,46 @@
     .main h5 {
       font-size: 32px;
     }
+
+    #splash {
+      position: fixed;
+      z-index: 4;
+      width: 100%;
+      height: 100%;
+      background-image: url(res/splash.jpg);
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center center;
+      will-change: transform;
+      transition: 0.3s ease;
+    }
+
+    #shade {
+      position: fixed;
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .gone {
+      display: none;
+    }
+
+    .slideAway {
+      transform: translateX(100%);
+    }
   </style>
 </head>
 
 <body>
+  <div id="shade">
+  </div>
+
+  <div id="splash">
+
+  </div>
+
   <div class="main" style="width: 448px; height: 650px; background-color:green;">
     <canvas id="game" height="496px" width="448px">Canvas not supported</canvas>
     <h5 id="score">SCORE: 0</h5>

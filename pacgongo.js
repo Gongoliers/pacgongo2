@@ -60,14 +60,17 @@ var Pacgongo = function(size) {
       } else if (currentBlock == map.pill) {
         this.score += 10;
         playSound(wakaWaka);
-        if(score % 10000 === 0){
-          player.lives++;
+        if(this.score % 10000 === 0){
+          this.lives++;
         }
         document.getElementById('score').innerHTML = "SCORE: " + this.score;
         map.map[Math.floor((this.y + this.height / 2) / size)][Math.floor((this.x + this.width / 2) / size)] = 2;
       } else if (currentBlock == map.powerup) {
         playSound(eatHatSound);
-        score += 50;
+        this.score += 50;
+        for(var i = 0; i < ghosts.length; i++){
+          ghosts[i].immune = false;
+        }
         this.superMode = true;
         this.superModeStartTime = Date.now();
         map.map[Math.floor((this.y + this.height / 2) / size)][Math.floor((this.x + this.width / 2) / size)] = 2;

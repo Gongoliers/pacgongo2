@@ -79,13 +79,15 @@ window.addEventListener("keydown", function(evt) {
 
 // Mobile support
 window.addEventListener("deviceorientation", function(event) {
-  if (event.gamma > 30) {
+  if( event.gamma === null && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+    alert("Sorry, your device is not supported!");
+  if (event.gamma > 20) {
     keystate = right;
-  } else if (event.gamma < -30) {
+  } else if (event.gamma < -20) {
     keystate = left;
-  } else if (event.beta < 0) {
+  } else if (event.beta < 5) {
     keystate = up;
-  } else if (event.beta > 30) {
+  } else if (event.beta > 25) {
     keystate = down;
   }
 });

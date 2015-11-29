@@ -13,6 +13,7 @@ var Ghost = function(size, xPos) {
     x: xPos,
     y: 14 * size,
     speed: 11 * size / 80,
+    immune: false,
     vel: {
       x: 0,
       y: 0
@@ -28,7 +29,7 @@ var Ghost = function(size, xPos) {
       var grid = map.getAstarMap();
       var finder = new PF.AStarFinder();
       var path;
-      if (!player.superMode) {
+      if (!player.superMode || this.immune) {
         path = finder.findPath(Math.round(this.x / BLOCK), Math.round(this.y / BLOCK),
           Math.round(player.x / BLOCK), Math.round(player.y / BLOCK), grid);
       } else {
@@ -61,19 +62,22 @@ var Ghost = function(size, xPos) {
 
       // Handle player collision
       if (intersect(player.x, player.y, player.width, player.height, this.x, this.y, this.width, this.height)) {
-        if (player.superMode) {
+        if (player.superMode && !this.immune) {
           player.score += 200;
           this.die();
+          this.immune = true;
         } else {
           player.die();
         }
       }
+      if(!player.superMode)
+        this.immune = false;
       this.x += this.vel.x;
       this.y += this.vel.y;
     },
     draw: function(ctx) {
       var time = Date.now() - player.superModeStartTime;
-      if (player.superMode && (time < 4000 || (time > 4500 && time < 5000) || (6000 > time && time > 5500))) {
+      if (!this.immune && player.superMode && (time < 4000 || (time > 4500 && time < 5000) || (6000 > time && time > 5500))) {
         ctx.drawImage(this.scareImage, this.x, this.y);
       } else
         ctx.drawImage(this.image, this.x, this.y);

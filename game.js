@@ -9,7 +9,7 @@ var canvas, ctx;
 // Audio
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 var audio = new AudioContext();
-var mainTheme, wakaWaka, dyingSound, eatHatSound;
+var mainTheme = null, wakaWaka = null, dyingSound=null, eatHatSound=null;
 var soundOn = null;
 var source;
 var volumeButton = document.getElementById("volume");

@@ -60,16 +60,20 @@ var Pacgongo = function(size) {
       } else if (currentBlock == map.pill) {
         this.score += 10;
         playSound(wakaWaka);
+        if(score % 10000 === 0){
+          player.lives++;
+        }
         document.getElementById('score').innerHTML = "SCORE: " + this.score;
         map.map[Math.floor((this.y + this.height / 2) / size)][Math.floor((this.x + this.width / 2) / size)] = 2;
       } else if (currentBlock == map.powerup) {
         playSound(eatHatSound);
+        score += 50;
         this.superMode = true;
         this.superModeStartTime = Date.now();
         map.map[Math.floor((this.y + this.height / 2) / size)][Math.floor((this.x + this.width / 2) / size)] = 2;
       }
       if (this.superMode) {
-        if (Date.now() - this.superModeStartTime >= 10000) {
+        if (Date.now() - this.superModeStartTime >= 6000) {
           this.superMode = false;
         }
       }

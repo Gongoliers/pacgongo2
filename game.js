@@ -99,12 +99,16 @@ var ghosts = [];
 // Map
 var map;
 
+// Round
+var round = 1;
+
 // Game loop
 function main() {
   loadSounds();
   canvas = document.getElementById("game");
   ctx = canvas.getContext("2d");
   init();
+  update();
   draw();
   ctx.font = "12px Arial";
   ctx.fillText("Ready!", WIDTH / 2 - 12, 18 * BLOCK - 5);
@@ -116,17 +120,24 @@ function main() {
 function loop() {
   update();
   draw();
-  console.log(map.count);
   if (map.count === 0 || (player.dying && player.lives >= 0)) {
+    player.superMode = false;
     for (var g = 0; g < 4; g++) {
       ghosts[g].x = 12 * BLOCK + g * BLOCK;
       ghosts[g].y = 14 * BLOCK;
+      if(2 >= round && round <= 4){
+        ghosts[g].speed = 11 * BLOCK / 60 * 0.85;
+      } else if(round >= 5){
+        ghosts[g].speed = 11 * BLOCK / 60 * 0.95;
+      }
     }
     player.x = 14 * BLOCK;
     player.y = 23 * BLOCK;
     player.dying = false;
-    if (map.count === 0)
+    if (map.count === 0){
       map = new Map(BLOCK);
+      round++;
+    }
     setTimeout(function() {
       ctx.fillText("Ready!", WIDTH / 2 - 12, 18 * BLOCK - 5);
       setTimeout(function() {
@@ -148,7 +159,19 @@ function init() {
   player = new Pacgongo(BLOCK);
   map = new Map(BLOCK);
   for (var i = 0; i < 4; i++) {
-    ghosts.push(new Ghost(BLOCK, 12 * BLOCK + i * BLOCK));
+    var scatterX, scatterY;
+    if(i % 2 === 0){
+      scatterX = 1;
+
+    } else {
+      scatterX = 26;
+    }
+    if(i === 0 || i === 1){
+      scatterY = 1;
+    } else {
+      scatterY = map.map.length-2;
+    }
+    ghosts.push(new Ghost(BLOCK, 12 * BLOCK + i * BLOCK, scatterX, scatterY));
   }
 }
 

@@ -73,7 +73,7 @@ var Ghost = function(size, xPos) {
     },
     draw: function(ctx) {
       var time = Date.now() - player.superModeStartTime;
-      if (player.superMode && (time < 8000 || (time > 8500 && time < 9000) || (10000 > time && time > 9500))) {
+      if (player.superMode && (time < 4000 || (time > 4500 && time < 5000) || (6000 > time && time > 5500))) {
         ctx.drawImage(this.scareImage, this.x, this.y);
       } else
         ctx.drawImage(this.image, this.x, this.y);

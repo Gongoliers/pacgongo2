@@ -116,9 +116,8 @@ function main() {
 function loop() {
   update();
   draw();
-  if (player.lives >= 0 && !player.dying)
-    window.requestAnimationFrame(loop, canvas);
-  else if ((player.dying && player.lives >= 0) || map.count === 0) {
+  console.log(map.count);
+  if (map.count === 0 || (player.dying && player.lives >= 0)) {
     for (var g = 0; g < 4; g++) {
       ghosts[g].x = 12 * BLOCK + g * BLOCK;
       ghosts[g].y = 14 * BLOCK;
@@ -134,6 +133,8 @@ function loop() {
         window.requestAnimationFrame(loop, canvas);
       }, 1000);
     }, 500);
+  } else if (player.lives >= 0 && !player.dying){
+    window.requestAnimationFrame(loop, canvas);
   } else {
     ctx.fillStyle = "#f00";
     ctx.fillText("Game Over!", WIDTH / 2 - 28, 18 * BLOCK - 5);

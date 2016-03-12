@@ -41,6 +41,12 @@ var Map = function(size) {
       [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ],
+    set: function(x, y, value){
+      this.map[y][x] = value;
+    },
+    get: function(x, y){
+      return this.map[y][x];
+    },
     getAstarMap: function(p) {
       var grid = new PF.Grid(this.map[0].length, this.map.length);
       for (var i = 0; i < this.map.length; i++) {

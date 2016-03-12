@@ -14,10 +14,45 @@ var Pacgongo = function(size) {
     score: 0,
     superMode: false,
     superModeStartTime: 0,
-    speed: 11 * size / 60,
+    speed: size / 4,
     vel: {
       x: 0,
       y: 0
+    },
+    setVelocity: function(direction, speed) {
+      switch (direction) {
+        case up:
+          this.vel.y = -speed;
+          this.vel.x = 0;
+          break;
+        case down:
+          this.vel.y = speed;
+          this.vel.x = 0;
+          break;
+        case left:
+          this.vel.x = -speed;
+          this.vel.y = 0;
+          break;
+        case right:
+          this.vel.x = speed;
+          this.vel.y = 0;
+          break;
+      }
+    },
+    move: function() {
+      this.x += this.vel.x;
+      this.y += this.vel.y;
+    },
+    stop: function() {
+      this.vel.x = 0;
+      this.vel.y = 0;
+    },
+    objectAt: function(x, y, relative) {
+      if (relative) {
+        x += this.x;
+        y += this.y;
+      }
+      return map.get(Math.floor(x / size), Math.floor(y / size));
     },
     die: function() {
       this.lives--;
@@ -36,80 +71,90 @@ var Pacgongo = function(size) {
     image: document.getElementById("pacgongo"),
     update: function(keystate, map) {
       // Handle blocks
-      var currentBlock = map.map[Math.floor((this.y + this.height / 2) / size)][Math.floor((this.x + this.width / 2) / size)];
+      var currentBlock = this.objectAt(0, 0, true);
       if (currentBlock === map.portal) {
         if (this.vel.x < 0) {
           this.x = size * 26 + this.width / 2;
         } else if (this.vel.x > 0) {
           this.x = this.width / 2;
         }
-      } else if (currentBlock == map.wall || currentBlock == map.ghostWall) {
-        if (this.vel.x < 0) {
-          this.x += this.speed + this.width / 2;
-          this.vel.x = 0;
-        } else if (this.vel.x > 0) {
-          this.x -= this.speed + this.width / 2;
-          this.vel.x = 0;
-        } else if (this.vel.y > 0) {
-          this.y -= this.speed + this.height / 2;
-          this.vel.y = 0;
-        } else if (this.vel.y < 0) {
-          this.y += this.speed + this.height / 2;
-          this.vel.y = 0;
-        }
       } else if (currentBlock == map.pill) {
         this.score += 10;
         playSound(wakaWaka);
-        if(this.score % 10000 === 0){
+        if (this.score % 10000 === 0) {
           this.lives++;
         }
         document.getElementById('score').innerHTML = "SCORE: " + this.score;
-        map.map[Math.floor((this.y + this.height / 2) / size)][Math.floor((this.x + this.width / 2) / size)] = 2;
+        map.set(Math.floor(this.x / size), Math.floor(this.y / size), map.empty);
       } else if (currentBlock == map.powerup) {
         playSound(eatHatSound);
         this.score += 50;
-        for(var i = 0; i < ghosts.length; i++){
+        for (var i = 0; i < ghosts.length; i++) {
           ghosts[i].immune = false;
         }
         this.superMode = true;
         this.superModeStartTime = Date.now();
-        map.map[Math.floor((this.y + this.height / 2) / size)][Math.floor((this.x + this.width / 2) / size)] = 2;
+        map.set(Math.floor(this.x / size), Math.floor(this.y / size), map.empty);
       }
       if (this.superMode) {
         if (Date.now() - this.superModeStartTime >= 6000) {
           this.superMode = false;
         }
       }
-      switch (keystate) {
-        case up:
-          if (map.map[Math.floor((this.y + this.height / 2) / size - 1)][Math.floor((this.x + this.width / 2) / size)] !== map.wall) {
-            this.vel.y = -this.speed;
-            this.vel.x = 0;
+      if (this.x % size === 0 && this.y % size === 0) {
+        if (currentKeyState != keystate) {
+          switch (keystate) {
+            case up:
+              if (this.objectAt(0, -size, true) != map.wall)
+                currentKeyState = keystate;
+
+              break;
+            case down:
+              var objDown = this.objectAt(0, size, true);
+              if (objDown !== map.wall &&
+                objDown !== map.ghostWall)
+                currentKeyState = keystate;
+              break;
+            case left:
+              if (this.objectAt(-size, 0, true) !== map.wall)
+                currentKeyState = keystate;
+              break;
+            case right:
+              if (this.objectAt(size, 0, true) != map.wall)
+                currentKeyState = keystate;
+              break;
           }
-          break;
-        case down:
-          if (map.map[Math.floor((this.y + this.height / 2) / size + 1)][Math.floor((this.x + this.width / 2) / size)] !== map.wall &&
-            map.map[Math.floor((this.y + this.height / 2) / size + 1)][Math.floor((this.x + this.width / 2) / size)] !== map.ghostWall) {
-            this.vel.y = this.speed;
-            this.vel.x = 0;
-          }
-          break;
-        case left:
-          if (map.map[Math.floor((this.y + this.height / 2) / size)][Math.floor((this.x + this.width / 2) / size - 1)] !== map.wall) {
-            this.vel.x = -this.speed;
-            this.vel.y = 0;
-          }
-          break;
-        case right:
-          if (map.map[Math.floor((this.y + this.height / 2) / size)][Math.floor((this.x + this.width / 2) / size + 1)] !== map.wall) {
-            this.vel.x = this.speed;
-            this.vel.y = 0;
-          }
-          break;
-        default:
+        }
+        switch (currentKeyState) {
+          case up:
+            if (this.objectAt(0, -size, true) != map.wall)
+              this.setVelocity(up, this.speed);
+            else
+              this.stop();
+            break;
+          case down:
+            var objDown = this.objectAt(0, size, true);
+            if (objDown !== map.wall &&
+              objDown !== map.ghostWall)
+              this.setVelocity(down, this.speed);
+            else
+              this.stop();
+            break;
+          case left:
+            if (this.objectAt(-size, 0, true) !== map.wall)
+              this.setVelocity(left, this.speed);
+            else
+              this.stop();
+            break;
+          case right:
+            if (this.objectAt(size, 0, true) !== map.wall)
+              this.setVelocity(right, this.speed);
+            else
+              this.stop();
+            break;
+        }
       }
-      this.x += this.vel.x;
-      this.y += this.vel.y;
+      this.move();
     },
     draw: function(ctx) {
       ctx.drawImage(this.image, this.x, this.y);

@@ -69,6 +69,7 @@ function loadSounds() {
 
 // Keypress
 var keystate = null;
+var currentKeyState = null;
 var up = 38,
   down = 40,
   left = 37,

@@ -126,11 +126,11 @@ function loop() {
     for (var g = 0; g < 4; g++) {
       ghosts[g].x = 12 * BLOCK + g * BLOCK;
       ghosts[g].y = 14 * BLOCK;
-      if(2 >= round && round <= 4){
-        ghosts[g].speed = 11 * BLOCK / 60 * 0.85;
-      } else if(round >= 5){
-        ghosts[g].speed = 11 * BLOCK / 60 * 0.95;
-      }
+      // if(2 >= round && round <= 4){
+      //   ghosts[g].speed = 11 * BLOCK / 60 * 0.85;
+      // } else if(round >= 5){
+      //   ghosts[g].speed = 11 * BLOCK / 60 * 0.95;
+      // }
     }
     player.x = 14 * BLOCK;
     player.y = 23 * BLOCK;

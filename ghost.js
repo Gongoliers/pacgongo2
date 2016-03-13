@@ -12,7 +12,7 @@ var Ghost = function(size, xPos) {
     width: size,
     x: xPos,
     y: 14 * size,
-    speed: 11 * size / 80,
+    speed: size / 8,
     immune: false,
     vel: {
       x: 0,

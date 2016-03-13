@@ -19,6 +19,19 @@ var Pacgongo = function(size) {
       x: 0,
       y: 0
     },
+    setScore: function(score, relative){
+      if(relative)
+        this.score += score;
+      else
+        this.score = score;
+    },
+    activateSuperMode: function(){
+      for (var i = 0; i < ghosts.length; i++) {
+        ghosts[i].immune = false;
+      }
+      this.superMode = true;
+      this.superModeStartTime = Date.now();
+    },
     setVelocity: function(direction, speed) {
       switch (direction) {
         case up:
@@ -38,6 +51,9 @@ var Pacgongo = function(size) {
           this.vel.y = 0;
           break;
       }
+    },
+    alignedWithGrid: function(){
+      return this.x % size === 0 && this.y % size === 0;
     },
     move: function() {
       this.x += this.vel.x;
@@ -74,12 +90,12 @@ var Pacgongo = function(size) {
       var currentBlock = this.objectAt(0, 0, true);
       if (currentBlock === map.portal) {
         if (this.vel.x < 0) {
-          this.x = size * 26 + this.width / 2;
+          this.x = size * 26;
         } else if (this.vel.x > 0) {
-          this.x = this.width / 2;
+          this.x = size;
         }
       } else if (currentBlock == map.pill) {
-        this.score += 10;
+        this.setScore(10, true);
         playSound(wakaWaka);
         if (this.score % 10000 === 0) {
           this.lives++;
@@ -88,12 +104,8 @@ var Pacgongo = function(size) {
         map.set(Math.floor(this.x / size), Math.floor(this.y / size), map.empty);
       } else if (currentBlock == map.powerup) {
         playSound(eatHatSound);
-        this.score += 50;
-        for (var i = 0; i < ghosts.length; i++) {
-          ghosts[i].immune = false;
-        }
-        this.superMode = true;
-        this.superModeStartTime = Date.now();
+        this.setScore(50, true);
+        this.activateSuperMode();
         map.set(Math.floor(this.x / size), Math.floor(this.y / size), map.empty);
       }
       if (this.superMode) {
@@ -101,7 +113,7 @@ var Pacgongo = function(size) {
           this.superMode = false;
         }
       }
-      if (this.x % size === 0 && this.y % size === 0) {
+      if (this.alignedWithGrid()) {
         if (currentKeyState != keystate) {
           switch (keystate) {
             case up:

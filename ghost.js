@@ -43,17 +43,17 @@ var Ghost = function(size, xPos) {
         }
       }
       if (path[1]) {
-        if (path[1][0] * BLOCK < this.x) {
+        if (path[1][0] * BLOCK < this.x) { // left
           this.vel.x = -this.speed;
-        } else if (path[1][0] * BLOCK > this.x) {
+        } else if (path[1][0] * BLOCK > this.x) { // right
           this.vel.x = this.speed;
         } else {
           this.vel.x = 0;
         }
 
-        if (path[1][1] * BLOCK < this.y) {
+        if (path[1][1] * BLOCK < this.y) { // up
           this.vel.y = -this.speed;
-        } else if (path[1][1] * BLOCK > this.y) {
+        } else if (path[1][1] * BLOCK > this.y) { // down
           this.vel.y = this.speed;
         } else {
           this.vel.y = 0;

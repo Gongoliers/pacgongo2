@@ -178,9 +178,9 @@ function init() {
 
 function update() {
   player.update(keystate, map);
-  for (var i = 0; i < ghosts.length; i++) {
-    ghosts[i].update(player, map);
-  }
+  ghosts.map(function(ghost){
+    ghost.update(player, map);
+  });
 }
 
 function draw() {
@@ -188,9 +188,9 @@ function draw() {
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
   map.draw(ctx);
   player.draw(ctx);
-  for (var i = 0; i < ghosts.length; i++) {
-    ghosts[i].draw(ctx);
-  }
+  ghosts.map(function(ghost){
+    ghost.draw(ctx);
+  });
 }
 
 main();
